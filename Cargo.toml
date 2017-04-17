@@ -1,0 +1,10 @@
+[package]
+name = "YealinkFirnware"
+version = "0.1.0"
+authors = ["Chabare <chabare95@gmail.com>"]
+
+[dependencies]
+hyper = ""
+regex = ""
+pretty-bytes = ""
+time = ""
