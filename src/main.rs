@@ -61,11 +61,16 @@ fn main() {
             let home_dir = home_dir().unwrap();
             let filename = link.rsplit("%2F").nth(0).unwrap();
             let path = Path::new(&home_dir).join(filename);
-            let mut file = File::create(path).unwrap();
+            let mut file = File::create(&path).unwrap();
             match file.write(file_content.as_slice()) {
                 Ok(size) => { println!("Successfully wrote `{}` with {} from `{}`.", filename, convert(size as f64), link) }
                 Err(e) => println!("Writing file `{}` failed due to error: {:?}", filename, e)
             };
+
+            Command::new("unzip")
+                .args(&["-n", path.to_str().unwrap()])
+                .status()
+                .expect("Failed to unzip archive.");
         }
     }
 
