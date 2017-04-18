@@ -88,9 +88,15 @@ fn main() {
                 Err(e) => println!("Writing file `{}` failed due to error: {:?}", filename, e)
             };
 
+            let output_path = match path.parent() {
+                Some(val) => { val.to_str().unwrap() }
+                None => home_dir.to_str().unwrap()
+            };
+            println!("Unzipping to {}", output_path);
+
             let start = time::now();
             Command::new("unzip")
-                .args(&["-n", path.to_str().unwrap()])
+                .args(&["-n", path.to_str().unwrap(), "-d", output_path])
                 .status()
                 .expect("Failed to unzip archive.");
             let end = time::now().sub(start);
