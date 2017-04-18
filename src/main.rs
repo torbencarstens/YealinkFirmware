@@ -75,10 +75,13 @@ fn main() {
                 Err(e) => println!("Writing file `{}` failed due to error: {:?}", filename, e)
             };
 
+            let start = time::now();
             Command::new("unzip")
                 .args(&["-n", path.to_str().unwrap()])
                 .status()
                 .expect("Failed to unzip archive.");
+            let end = time::now().sub(start);
+            println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
         }
     }
 
