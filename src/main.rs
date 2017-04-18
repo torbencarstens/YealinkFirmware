@@ -28,18 +28,27 @@ fn main() {
     let mut body = String::new();
     response.read_to_string(&mut body).unwrap();
 
-    // Get the first link(a) with the parent <div class="file-title"
-    let firmware_notes_string = "<div id=\"frnotes\"";
-    let start_index = body.as_str().find(firmware_notes_string).expect(format!("Couldn't find firmware notes on `{}`", url).as_str());
-    
-    // Firmware name has to be of the following form:
-    // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
-    let regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
-    let regex_match = regex.find_at(body.as_str(), start_index).unwrap().as_str();
+    let mut regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
+    let mut regex_match: Option<regex::Match> = regex.find(body.as_str());
 
-    let captures = regex.captures(regex_match);
-    if captures.is_none() {
-        println!("No valid link was found on `{}`.", url)
+    if regex_match.is_none() {
+        println!("Failed to get link via `New` tag, using alternative method.");
+        // Get the first link(a) with the parent <div class="file-title"
+        let firmware_notes_string = "<div id=\"frnotes\"";
+        let start_index = body.as_str().find(firmware_notes_string).expect(format!("Couldn't find firmware notes on `{}`", url).as_str());
+
+        // Firmware name has to be of the following form:
+        // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
+        regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
+        regex_match = regex.find_at(body.as_str(), start_index);
+    }
+
+    let mut captures: Option<regex::Captures> = None;
+    if regex_match.is_some() {
+        captures = regex.captures(regex_match.unwrap().as_str());
+        if captures.is_none() {
+            println!("No valid link was found on `{}`.", url)
+        }
     }
 
     if captures.is_some() {
