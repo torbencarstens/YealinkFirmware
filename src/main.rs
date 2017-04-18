@@ -12,6 +12,7 @@ use regex::Regex;
 use std::env::home_dir;
 use std::fs::File;
 use std::path::Path;
+use std::process::Command;
 use std::io::{Read, Write};
 use std::ops::Sub;
 
@@ -28,8 +29,15 @@ fn main() {
     response.read_to_string(&mut body).unwrap();
 
     // Get the first link(a) with the parent <div class="file-title"
-    let regex = Regex::new("<div class=\"file-title\">\\n\\s*<a href=\"(?P<link>[^\"]+\\.zip)\"").expect("Regex failed");
-    let captures = regex.captures(body.as_str());
+    let firmware_notes_string = "<div id=\"frnotes\"";
+    let start_index = body.as_str().find(firmware_notes_string).expect(format!("Couldn't find firmware notes on `{}`", url).as_str());
+    
+    // Firmware name has to be of the following form:
+    // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
+    let regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
+    let regex_match = regex.find_at(body.as_str(), start_index).unwrap().as_str();
+
+    let captures = regex.captures(regex_match);
     if captures.is_none() {
         println!("No valid link was found on `{}`.", url)
     }
