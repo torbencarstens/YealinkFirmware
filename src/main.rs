@@ -79,8 +79,12 @@ fn main() {
             let filename = link.rsplit("%2F").nth(0).unwrap();
             let path = Path::new(&home_dir).join(filename);
             let mut file = File::create(&path).unwrap();
+            let start = time::now();
             match file.write(file_content.as_slice()) {
-                Ok(size) => { println!("Successfully wrote `{}` with {} from `{}`.", filename, convert(size as f64), link) }
+                Ok(size) => {
+                    let end = time::now().sub(start);
+                    println!("Successfully wrote `{}` with {} from `{}` in {}.{}s.", filename, convert(size as f64), link, end.num_seconds(), end.num_milliseconds())
+                }
                 Err(e) => println!("Writing file `{}` failed due to error: {:?}", filename, e)
             };
 
