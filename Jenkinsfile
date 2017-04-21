@@ -38,6 +38,11 @@ pipeline {
                 sh 'cargo build --release'
             }
         }
+        stage('Test') {
+            steps {
+                sh 'ls -aR'
+            }
+        }
         stage('Archive') {
             when {
                 expression {
