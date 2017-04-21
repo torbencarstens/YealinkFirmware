@@ -38,12 +38,6 @@ pipeline {
                 sh 'cargo build --release'
             }
         }
-        stage('Test') {
-            steps {
-                sh 'ls -aR'
-                echo findFiles("*.rom")
-            }
-        }
         stage('Archive') {
             when {
                 expression {
