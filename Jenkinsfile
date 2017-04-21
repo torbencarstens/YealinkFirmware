@@ -7,7 +7,7 @@ pipeline {
         stage('Build stable') {
             steps {
 		script {
-			def files = findFiles("*.rom")
+			def files = findFiles(glob: "*.rom")
 			echo "${files}"
 		}
                 sh 'rustup default stable'
