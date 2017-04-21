@@ -6,8 +6,10 @@ pipeline {
     stages {
         stage('Build stable') {
             steps {
-		def files = findFiles("*.rom")
-		echo "${files}"
+		script {
+			def files = findFiles("*.rom")
+			echo "${files}"
+		}
                 sh 'rustup default stable'
                 sh 'cargo build -v'
             }
