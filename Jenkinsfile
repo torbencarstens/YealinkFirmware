@@ -41,12 +41,13 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'ls -aR'
+		echo findFiles("*.rom")
             }
         }
         stage('Archive') {
             when {
                 expression {
-                    return fileExists('*.rom')
+                    return !findFiles('*.rom').isEmpty()
                 }
             }
             steps {
