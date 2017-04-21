@@ -39,13 +39,15 @@ pipeline {
 			}
         }
         stage('Archive') {
+		steps {
             when {
                 expression {
-                    fileExists '*.rom'
+                    return fileExists '*.rom'
                 }
             } steps {
                 archiveArtifacts '*.rom'
             }
         }
+	}
 	}
 }
