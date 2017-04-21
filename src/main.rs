@@ -12,7 +12,6 @@ use pretty_bytes::converter::convert;
 
 use regex::Regex;
 
-use std::env::home_dir;
 use std::fs::{remove_file, File};
 use std::path::Path;
 use std::process::Command;
@@ -28,6 +27,9 @@ fn main() {
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
     let device_id = 33;
     let url = format!("{}{}", base_url, device_id);
+    // Target directory has a default value -> Safe usage of unwrap
+    let matches = app.get_matches();
+    let target_directory = matches.value_of("Target directory").unwrap();
     let remove_zip = matches.is_present("Remove zip");
 
     // Read the content from the support site of the device
@@ -83,9 +85,8 @@ fn main() {
                 Err(error) => println!("Downloading firmware from `{}` failed due to error: {:?}", link, error)
             };
 
-            let home_dir = home_dir().unwrap();
             let filename = link.rsplit("%2F").nth(0).unwrap();
-            let path = Path::new(&home_dir).join(filename);
+            let path = Path::new(&target_directory).join(filename);
             let mut file = File::create(&path).unwrap();
             let start = time::now();
             match file.write(file_content.as_slice()) {
@@ -98,7 +99,7 @@ fn main() {
 
             let output_path = match path.parent() {
                 Some(val) => { val.to_str().unwrap() }
-                None => home_dir.to_str().unwrap()
+                None => target_directory
             };
             println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
             let start = time::now();
