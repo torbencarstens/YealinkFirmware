@@ -13,7 +13,7 @@ use pretty_bytes::converter::convert;
 use regex::Regex;
 
 use std::env::home_dir;
-use std::fs::File;
+use std::fs::{remove_file, File};
 use std::path::Path;
 use std::process::Command;
 use std::io::{Read, Write};
@@ -28,6 +28,7 @@ fn main() {
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
     let device_id = 33;
     let url = format!("{}{}", base_url, device_id);
+    let remove_zip = matches.is_present("Remove zip");
 
     // Read the content from the support site of the device
     let client = Client::new();
@@ -106,6 +107,12 @@ fn main() {
                 .status()
                 .expect("Failed to unzip archive.");
             let end = time::now().sub(start);
+            if remove_zip {
+                match remove_file(&path) {
+                    Ok(_) => { println!("Successfully deleted .zip file.") }
+                    Err(e) => println!("Failed to delete .zip file: {:?}", e)
+                };
+            }
             println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
         }
     }
