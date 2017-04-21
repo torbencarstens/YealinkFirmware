@@ -23,14 +23,20 @@ pipeline {
             }
 		}
         stage('Run stable') {
-            sh 'rustup default stable'
-            sh 'cargo run'
+			steps {
+	            sh 'rustup default stable'
+	            sh 'cargo run'
+			}
         }
         stage ('Test stable') {
-            sh 'cargo test'
+			steps {
+	            sh 'cargo test'
+			}
         }
         stage('Release') {
-            sh 'cargo build --release'
+			steps {
+	            sh 'cargo build --release'
+			}
         }
         stage('Archive') {
             when {
