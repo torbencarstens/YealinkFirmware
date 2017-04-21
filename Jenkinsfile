@@ -47,7 +47,7 @@ pipeline {
         stage('Archive') {
             when {
                 expression {
-                    return !findFiles('*.rom').isEmpty()
+                    return !findFiles(glob: '*.rom').isEmpty()
                 }
             }
             steps {
