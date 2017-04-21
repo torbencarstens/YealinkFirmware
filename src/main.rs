@@ -83,7 +83,7 @@ fn main() {
             match file.write(file_content.as_slice()) {
                 Ok(size) => {
                     let end = time::now().sub(start);
-                    println!("Successfully wrote `{}` with {} from `{}` in {}.{}s.", filename, convert(size as f64), link, end.num_seconds(), end.num_milliseconds())
+                    println!("Successfully wrote `{}` with {} from `{}` in {}.{}s.", path.as_path().to_str().unwrap(), convert(size as f64), link, end.num_seconds(), end.num_milliseconds())
                 }
                 Err(e) => println!("Writing file `{}` failed due to error: {:?}", filename, e)
             };
@@ -92,8 +92,7 @@ fn main() {
                 Some(val) => { val.to_str().unwrap() }
                 None => home_dir.to_str().unwrap()
             };
-            println!("Unzipping to {}", output_path);
-
+            println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
             let start = time::now();
             Command::new("unzip")
                 .args(&["-n", path.to_str().unwrap(), "-d", output_path])
