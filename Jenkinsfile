@@ -7,19 +7,19 @@ pipeline {
 		stage('Build stable') {
 			steps {
 				sh 'rustup default stable'
-				sh 'cargo build'
+				sh 'cargo build -v'
 			}
 		}
 		stage ('Build beta') {
             steps {
                 sh 'rustup default beta'
-				sh 'cargo build'
+				sh 'cargo build -v'
             }
 		}
 		stage ('Build nightly') {
             steps {
                 sh 'rustup default nightly'
-				sh 'cargo build'
+				sh 'cargo build -v'
             }
 		}
         stage('Run stable') {
