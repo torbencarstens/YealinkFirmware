@@ -5,7 +5,9 @@ pipeline {
 
 	stages {
 		stage('Build') {
-			cargo build
+			steps {
+				cargo build
+			}
 		}
 	}
 }
