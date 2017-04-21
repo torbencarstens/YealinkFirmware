@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Chabare <chabare95@gmail.com>"]
 
 [dependencies]
+clap = ""
 hyper = ""
 regex = ""
 pretty-bytes = ""

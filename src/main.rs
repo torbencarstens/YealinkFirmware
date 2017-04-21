@@ -1,7 +1,10 @@
+extern crate clap;
 extern crate hyper;
 extern crate pretty_bytes;
 extern crate regex;
 extern crate time;
+
+use clap::{App, Arg};
 
 use hyper::Client;
 
@@ -17,6 +20,10 @@ use std::io::{Read, Write};
 use std::ops::Sub;
 
 fn main() {
+    let mut app: App = App::new("YealinkFirmware");
+    app = app.arg(Arg::with_name("Target directory").long("directory").short("d").takes_value(true).default_value(".").max_values(1).help("Directory where the zip file will be written to."));
+    app = app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."));
+
     let start = time::now();
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
     let device_id = 33;
