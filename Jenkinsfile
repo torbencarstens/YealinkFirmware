@@ -6,10 +6,6 @@ pipeline {
     stages {
         stage('Build stable') {
             steps {
-		script {
-			def files = findFiles(glob: "*.rom")
-			echo "${files}"
-		}
                 sh 'rustup default stable'
                 sh 'cargo build -v'
             }
@@ -45,13 +41,14 @@ pipeline {
         stage('Test') {
             steps {
                 sh 'ls -aR'
-		echo findFiles("*.rom")
+                echo findFiles("*.rom")
             }
         }
         stage('Archive') {
             when {
                 expression {
-                    return !findFiles(glob: '*.rom').isEmpty()
+                    def files = findFiles(glob: "*.rom")
+                    return !files.isEmpty()
                 }
             }
             steps {
