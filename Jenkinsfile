@@ -42,7 +42,7 @@ pipeline {
 		steps {
             when {
                 expression {
-                    return fileExists '*.rom'
+                    return fileExists('*.rom')
                 }
             } steps {
                 archiveArtifacts '*.rom'
