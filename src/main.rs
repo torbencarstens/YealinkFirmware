@@ -12,7 +12,8 @@ use pretty_bytes::converter::convert;
 
 use regex::Regex;
 
-use std::fs::{remove_file, File};
+use std::fs;
+use std::fs::File;
 use std::path::Path;
 use std::process::Command;
 use std::io::{Read, Write};
@@ -107,7 +108,7 @@ fn main() {
                 .expect("Failed to unzip archive.");
             let end = time::now().sub(start);
             if remove_zip {
-                match remove_file(&path) {
+                match fs::remove_file(&path) {
                     Ok(_) => { println!("Successfully deleted .zip file.") }
                     Err(e) => println!("Failed to delete .zip file: {:?}", e)
                 };
