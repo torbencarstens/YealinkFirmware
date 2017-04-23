@@ -19,9 +19,7 @@ use std::io::{Read, Write};
 use std::ops::Sub;
 
 fn main() {
-    let mut app: App = App::new("YealinkFirmware");
-    app = app.arg(Arg::with_name("Target directory").long("directory").short("d").takes_value(true).default_value(".").max_values(1).help("Directory where the zip file will be written to."));
-    app = app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."));
+    let mut app = get_command_line_app();
 
     let start = time::now();
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
@@ -124,4 +122,10 @@ fn main() {
 
 fn get_device_url(base: &str, id: i32) -> String {
     format!("{}{}", base, id)
+}
+
+fn get_command_line_app() -> App {
+    let mut app: App = App::new("YealinkFirmware");
+    app = app.arg(Arg::with_name("Target directory").long("directory").short("d").takes_value(true).default_value(".").max_values(1).help("Directory where the zip file will be written to."));
+    app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."))
 }
