@@ -4,7 +4,7 @@ extern crate pretty_bytes;
 extern crate regex;
 extern crate time;
 
-use clap::{App, Arg};
+use clap::{App, Arg, ArgMatches};
 
 use hyper::Client;
 
@@ -27,7 +27,7 @@ fn main() {
     let url = get_device_url(base_url, t23p_id);
     // Target directory has a default value -> Safe usage of unwrap
     let matches = app.get_matches();
-    let target_directory = matches.value_of("Target directory").unwrap();
+    let target_directory = get_target_directory(&matches);
     let remove_zip = matches.is_present("Remove zip");
 
     // Read the content from the support site of the device
@@ -97,7 +97,7 @@ fn main() {
 
             let output_path = match path.parent() {
                 Some(val) => { val.to_str().unwrap() }
-                None => target_directory
+                None => target_directory.as_str()
             };
             println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
             let start = time::now();
@@ -122,6 +122,14 @@ fn main() {
 
 fn get_device_url(base: &str, id: i32) -> String {
     format!("{}{}", base, id)
+}
+
+fn get_target_directory<'a>(matches: &ArgMatches<'a>) -> String {
+    match matches.value_of("Target directory") {
+        Some(val) => { val.to_string() }
+        // Target directory should have a default value, JIC
+        None => ".".to_string()
+    }
 }
 
 fn get_command_line_app<'a, 'b>() -> App<'a, 'b> {
