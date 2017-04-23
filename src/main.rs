@@ -25,8 +25,8 @@ fn main() {
 
     let start = time::now();
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
-    let device_id = 33;
-    let url = format!("{}{}", base_url, device_id);
+    let t23p_id = 33;
+    let url = get_device_url(base_url, t23p_id);
     // Target directory has a default value -> Safe usage of unwrap
     let matches = app.get_matches();
     let target_directory = matches.value_of("Target directory").unwrap();
@@ -120,4 +120,8 @@ fn main() {
 
     let end = time::now().sub(start);
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
+}
+
+fn get_device_url(base: &str, id: i32) -> String {
+    format!("{}{}", base, id)
 }
