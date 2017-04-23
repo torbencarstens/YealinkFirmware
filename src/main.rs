@@ -36,19 +36,18 @@ fn main() {
     let client = get_client();
     let body: String = get_body(url.as_str(), &client);
 
-
     let new_firmware_regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
     let regex_match: Option<regex::Match> = get_firmware(&new_firmware_regex, body.as_str(), url.as_str());
 
     let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
 
-    if captures.is_some() {
-        let captures = captures.unwrap();
-        let link = captures.name("link").unwrap().as_str();
+    let link = get_link(captures);
 
+    if link.is_some() {
+        let link = link.unwrap();
         let file_content = download_firmware(&link, &client);
 
-        let filename = get_filename(link);
+        let filename = get_filename(link.as_str());
         let path = get_path(filename, &target_directory);
         let mut file = File::create(&path).unwrap();
 
@@ -74,10 +73,7 @@ fn main() {
                 println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
 
                 if remove_zip {
-                    match fs::remove_file(&path) {
-                        Ok(_) => { println!("Successfully deleted .zip file.") }
-                        Err(e) => println!("Failed to delete .zip file: {:?}", e)
-                    };
+                    delete_zip(&path)
                 }
             }
             Err(e) => {
@@ -88,6 +84,13 @@ fn main() {
 
     let end = time::now().sub(start);
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
+}
+
+fn delete_zip(path: &Path) {
+    match fs::remove_file(&path) {
+        Ok(_) => { println!("Successfully deleted .zip file.") }
+        Err(e) => println!("Failed to delete .zip file: {:?}", e)
+    };
 }
 
 fn unzip<'a>(path: &Path, output_path: &'a str) -> io::Result<ExitStatus> {
@@ -142,6 +145,13 @@ fn write_file(file: &mut File, content: Vec<u8>) -> io::Result<usize> {
 
 fn find_new_firmware<'a>(new_firmware_regex: &Regex, body: &'a str) -> Option<regex::Match<'a>> {
     new_firmware_regex.find(body)
+}
+
+fn get_link(captures: Option<regex::Captures>) -> Option<String> {
+    match captures {
+        Some(captures) => { Some(captures.name("link").unwrap().as_str().to_string()) }
+        None => None
+    }
 }
 
 fn get_captures<'a>(regex: &Regex, regex_match: Option<regex::Match<'a>>) -> Option<regex::Captures<'a>> {
