@@ -43,13 +43,7 @@ fn main() {
         None => get_new_firmware(body.as_str())
     };
 
-    let mut captures: Option<regex::Captures> = None;
-    if regex_match.is_some() {
-        captures = regex.captures(regex_match.unwrap().as_str());
-        if captures.is_none() {
-            println!("No valid link was found on `{}`.", url)
-        }
-    }
+    let captures: Option<regex::Captures> = get_captures(&regex, regex_match);
 
     if captures.is_some() {
         let link = captures.unwrap().name("link").unwrap().as_str();
@@ -110,6 +104,17 @@ fn main() {
 
     let end = time::now().sub(start);
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
+}
+
+fn get_captures<'a>(regex: &Regex, regex_match: Option<regex::Match<'a>>) -> Option<regex::Captures<'a>> {
+    match regex_match {
+        Some(val) => {
+            let searchable: &'a str = val.as_str();
+            let captures: Option<regex::Captures<'a>> = regex.captures(searchable);
+            captures
+        }
+        None => None
+    }
 }
 
 fn get_new_firmware<'a>(body: &'a str) -> Option<regex::Match<'a>> {
