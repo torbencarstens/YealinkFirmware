@@ -30,19 +30,15 @@ fn main() {
     let t23p_id = 33;
     let url = get_device_url(base_url, t23p_id);
 
-    // Target directory has a default value -> Safe usage of unwrap
     let target_directory = get_target_directory(&matches);
     let remove_zip = matches.is_present("Remove zip");
 
-    // Read the content from the support site of the device
     let client = get_client();
     let body: String = get_body(url.as_str(), &client);
 
+
     let new_firmware_regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
-    let regex_match: Option<regex::Match> = match new_firmware_regex.find(body.as_str()) {
-        Some(val) => { Some(val) }
-        None => get_new_firmware(body.as_str())
-    };
+    let regex_match: Option<regex::Match> = get_firmware(&new_firmware_regex, body.as_str(), url.as_str());
 
     let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
 
@@ -50,7 +46,7 @@ fn main() {
         let captures = captures.unwrap();
         let link = captures.name("link").unwrap().as_str();
 
-        let file_content = get_firmware(&link, &client);
+        let file_content = download_firmware(&link, &client);
 
         let filename = get_filename(link);
         let path = get_path(filename, &target_directory);
@@ -108,7 +104,14 @@ fn get_path<'a>(filename: &'a str, target_directory: &String) -> PathBuf {
     Path::new(&target_directory).join(filename)
 }
 
-fn get_firmware<'a>(link: &'a str, client: &Client) -> Vec<u8> {
+fn get_firmware<'a>(new_firmware_regex: &Regex, body: &'a str, url: &'a str) -> Option<regex::Match<'a>> {
+    match find_new_firmware(&new_firmware_regex, body) {
+        Some(val) => { Some(val) }
+        None => get_first_firmware(body, url)
+    }
+}
+
+fn download_firmware<'a>(link: &'a str, client: &Client) -> Vec<u8> {
     let response: Option<hyper::client::Response> = match client.get(link).send() {
         Ok(val) => { Some(val) }
         Err(e) => {
@@ -137,6 +140,10 @@ fn write_file(file: &mut File, content: Vec<u8>) -> io::Result<usize> {
     file.write(content.as_slice())
 }
 
+fn find_new_firmware<'a>(new_firmware_regex: &Regex, body: &'a str) -> Option<regex::Match<'a>> {
+    new_firmware_regex.find(body)
+}
+
 fn get_captures<'a>(regex: &Regex, regex_match: Option<regex::Match<'a>>) -> Option<regex::Captures<'a>> {
     match regex_match {
         Some(val) => {
@@ -148,8 +155,7 @@ fn get_captures<'a>(regex: &Regex, regex_match: Option<regex::Match<'a>>) -> Opt
     }
 }
 
-fn get_new_firmware<'a>(body: &'a str) -> Option<regex::Match<'a>> {
-    let url = "test";
+fn get_first_firmware<'a>(body: &'a str, url: &'a str) -> Option<regex::Match<'a>> {
     println!("Failed to get link via `New` tag, using alternative method.");
     // Get the first link(a) with the parent <div class="file-title"
     let firmware_notes_string = "<div id=\"frnotes\"";
