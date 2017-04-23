@@ -32,10 +32,8 @@ fn main() {
     let remove_zip = matches.is_present("Remove zip");
 
     // Read the content from the support site of the device
-    let mut response = client.get(url.as_str()).send().unwrap();
-    let mut body = String::new();
-    response.read_to_string(&mut body).unwrap();
     let client = get_client();
+    let body: String = get_body(url.as_str(), &client);
 
     let regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
     let regex_match: Option<regex::Match> = match regex.find(body.as_str()) {
@@ -150,4 +148,12 @@ fn get_command_line_app<'a, 'b>() -> App<'a, 'b> {
 
 fn get_client() -> Client {
     Client::new()
+}
+
+fn get_body<'a>(url: &'a str, client: &Client) -> String {
+    let mut response = client.get(url).send().unwrap();
+    let mut body = String::new();
+    response.read_to_string(&mut body).unwrap();
+
+    body
 }
