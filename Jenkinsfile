@@ -42,7 +42,7 @@ pipeline {
             when {
                 expression {
                     def files = findFiles(glob: "*.rom")
-                    return !files.isEmpty()
+                    return files != null && !files.empty
                 }
             }
             steps {
