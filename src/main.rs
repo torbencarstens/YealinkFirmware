@@ -20,12 +20,14 @@ use std::io::{Read, Write};
 use std::ops::Sub;
 
 fn main() {
+    let start = time::now();
+
     let app = get_command_line_app();
 
-    let start = time::now();
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
     let t23p_id = 33;
     let url = get_device_url(base_url, t23p_id);
+
     // Target directory has a default value -> Safe usage of unwrap
     let matches = app.get_matches();
     let target_directory = get_target_directory(&matches);
