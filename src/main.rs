@@ -37,20 +37,11 @@ fn main() {
     let mut body = String::new();
     response.read_to_string(&mut body).unwrap();
 
-    let mut regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
-    let mut regex_match: Option<regex::Match> = regex.find(body.as_str());
-
-    if regex_match.is_none() {
-        println!("Failed to get link via `New` tag, using alternative method.");
-        // Get the first link(a) with the parent <div class="file-title"
-        let firmware_notes_string = "<div id=\"frnotes\"";
-        let start_index = body.as_str().find(firmware_notes_string).expect(format!("Couldn't find firmware notes on `{}`", url).as_str());
-
-        // Firmware name has to be of the following form:
-        // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
-        regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
-        regex_match = regex.find_at(body.as_str(), start_index);
-    }
+    let regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
+    let regex_match: Option<regex::Match> = match regex.find(body.as_str()) {
+        Some(val) => { Some(val) }
+        None => get_new_firmware(body.as_str())
+    };
 
     let mut captures: Option<regex::Captures> = None;
     if regex_match.is_some() {
@@ -119,6 +110,19 @@ fn main() {
 
     let end = time::now().sub(start);
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
+}
+
+fn get_new_firmware<'a>(body: &'a str) -> Option<regex::Match<'a>> {
+    let url = "test";
+    println!("Failed to get link via `New` tag, using alternative method.");
+    // Get the first link(a) with the parent <div class="file-title"
+    let firmware_notes_string = "<div id=\"frnotes\"";
+    let start_index = body.find(firmware_notes_string).expect(format!("Couldn't find firmware notes on `{}`", url).as_str());
+
+    // Firmware name has to be of the following form:
+    // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
+    let regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
+    regex.find_at(body, start_index)
 }
 
 fn get_device_url(base: &str, id: i32) -> String {
