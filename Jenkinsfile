@@ -49,6 +49,17 @@ pipeline {
                 archiveArtifacts '*.rom'
             }
         }
+        stage('Deploy') {
+            def files = findFiles(glob: "*.rom")
+            when {
+                expression {
+                    return files != null && files.size() > 0
+                }
+            }
+            steps {
+                sh 'python3 deploy.py ${files[0]}'
+            }
+        }
     }
     post {
         always {
