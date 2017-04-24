@@ -50,13 +50,14 @@ pipeline {
             }
         }
         stage('Deploy') {
-            def files = findFiles(glob: "*.rom")
             when {
                 expression {
+                    def files = findFiles(glob: "*.rom")
                     return files != null && files.size() > 0
                 }
             }
             steps {
+                def files = findFiles(glob: "*.rom")
                 sh 'python3 deploy.py ${files[0]}'
             }
         }
