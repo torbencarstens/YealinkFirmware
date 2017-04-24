@@ -59,7 +59,8 @@ pipeline {
             steps {
                 script {
                     def files = findFiles(glob: "*.rom")
-                    sh 'python3 deploy.py ${files[0]}'
+                    def file = files[0]
+                    sh "python3 deploy.py ${file}"
                 }
             }
         }
