@@ -57,8 +57,10 @@ pipeline {
                 }
             }
             steps {
-                def files = findFiles(glob: "*.rom")
-                sh 'python3 deploy.py ${files[0]}'
+                script {
+                    def files = findFiles(glob: "*.rom")
+                    sh 'python3 deploy.py ${files[0]}'
+                }
             }
         }
     }
