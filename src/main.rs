@@ -49,7 +49,6 @@ fn main() {
 
         let filename = get_filename_for_firmware(link.as_str());
         let path = get_path(&target_directory, filename);
-        let path = get_path(&target_directory, filename);
         let mut file = File::create(&path).unwrap();
 
         let start = time::now();
