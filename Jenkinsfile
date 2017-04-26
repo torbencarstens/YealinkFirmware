@@ -1,5 +1,10 @@
 #!groovy
 
+properties([
+        pipelineTriggers([cron('0 0 * * *')])
+]
+)
+
 pipeline {
     agent any
 
