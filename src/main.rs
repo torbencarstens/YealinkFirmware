@@ -37,9 +37,15 @@ fn main() {
     let body: String = get_body(url.as_str(), &client);
 
     let new_firmware_regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
-    let regex_match: Option<regex::Match> = get_firmware(&new_firmware_regex, body.as_str(), url.as_str());
+    let captures = match get_firmware_match(&new_firmware_regex, body.as_str(), url.as_str()) {
+        (val, false) => { get_captures(&new_firmware_regex, val) }
+        (val, true) => {
+            let alternate_firmware_regex = Regex::new("href=\"(?P<link>.*\\.zip)\"").expect("Failed to compile alternative firmware regex");
+            get_captures(&alternate_firmware_regex, val)
+        }
+    };
 
-    let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
+    // let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
 
     let link = get_link(captures);
 
@@ -107,10 +113,10 @@ fn get_path<'a>(target_directory: &String, filename: &'a str) -> PathBuf {
     Path::new(&target_directory).join(filename)
 }
 
-fn get_firmware<'a>(new_firmware_regex: &Regex, body: &'a str, url: &'a str) -> Option<regex::Match<'a>> {
+fn get_firmware_match<'a>(new_firmware_regex: &Regex, body: &'a str, url: &'a str) -> (Option<regex::Match<'a>>, bool) {
     match find_new_firmware(&new_firmware_regex, body) {
-        Some(val) => { Some(val) }
-        None => get_first_firmware(body, url)
+        Some(val) => { (Some(val), false) }
+        None => (get_first_firmware(body, url), true)
     }
 }
 
@@ -156,7 +162,10 @@ fn find_new_firmware<'a>(new_firmware_regex: &Regex, body: &'a str) -> Option<re
 fn get_link(captures: Option<regex::Captures>) -> Option<String> {
     match captures {
         Some(captures) => { Some(captures.name("link").unwrap().as_str().to_string()) }
-        None => None
+        None => {
+            println!("No captures found while searching for link.");
+            None
+        }
     }
 }
 
@@ -167,7 +176,10 @@ fn get_captures<'a>(regex: &Regex, regex_match: Option<regex::Match<'a>>) -> Opt
             let captures: Option<regex::Captures<'a>> = regex.captures(searchable);
             captures
         }
-        None => None
+        None => {
+            println!("No match found while getting captures.");
+            None
+        }
     }
 }
 
@@ -179,7 +191,7 @@ fn get_first_firmware<'a>(body: &'a str, url: &'a str) -> Option<regex::Match<'a
 
     // Firmware name has to be of the following form:
     // \w+\d+-\d+(\.\d+)+\.zip -> e.g. T23-44.81.0.70.zip
-    let regex = Regex::new("href=\"(?P<link>.*\\w+\\d+-\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
+    let regex = Regex::new("href=\"(?P<link>.*(\\w+\\d+-)?\\d+(\\.\\d+)+\\.zip)\"").expect("Regex failed");
     regex.find_at(body, start_index)
 }
 
