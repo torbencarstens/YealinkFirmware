@@ -12,7 +12,7 @@ try:
   bucket_name = sys.argv[2]
 except IndexError:
   print("Using 'yealink-firmware' as bucket-name")
-  bucket_name = yealink-firmware
+  bucket_name = "yealink-firmware"
 
 region_name = "eu-central-1"
 config = botocore.config.Config(region_name=region_name, signature_version='v4')
