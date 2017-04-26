@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Credential test') {
             steps {
-                withCredentials([file(credentialsId: 'credentials', variable: 'credentials')]) {
+                withCredentials([file(credentialsId: 'github_token', variable: 'credentials')]) {
                     echo "${credentials}"
                 }
             }
