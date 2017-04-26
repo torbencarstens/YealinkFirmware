@@ -7,7 +7,7 @@ except IndexError:
   print("Please specify a file to upload as cmd argument")
   sys.exit(2)
 
-s3 = boto3.resource('s3')
+s3 = boto3.resource('s3', region_name="eu-central-1")
 bucket_name = "yealink-firmware"
 bucket = s3.Bucket(bucket_name)
 
