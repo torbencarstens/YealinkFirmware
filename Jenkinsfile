@@ -6,8 +6,9 @@ pipeline {
     stages {
         stage('Credential test') {
             steps {
-                withCredentials([file(credentialsId: 'aws-credentials', variable: 'credentials')]) {
-                    echo "${credentials}"
+                withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'aws-s3-credentials', usernameVariable: 'access_key_id', passwordVariable: 'secret_access_key']]) {
+                    echo "${env.access_key_id}"
+                    echo "${secret_access_key}"
                 }
             }
         }
