@@ -11,7 +11,7 @@ except IndexError:
 try:
   bucket_name = sys.argv[2]
 except IndexError:
-  print("Using 'yealink-firmware'" as bucket-name")
+  print("Using 'yealink-firmware' as bucket-name")
   bucket_name = yealink-firmware
 
 region_name = "eu-central-1"
