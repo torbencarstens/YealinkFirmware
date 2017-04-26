@@ -27,8 +27,8 @@ fn main() {
     let matches = app.get_matches();
 
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
-    let t23p_id = 33;
-    let url = get_device_url(base_url, t23p_id);
+    let device_idc = 33;
+    let url = get_device_url(base_url, device_id);
 
     let target_directory = get_target_directory(&matches);
     let remove_zip = matches.is_present("Remove zip");
