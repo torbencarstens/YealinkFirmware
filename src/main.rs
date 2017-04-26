@@ -47,8 +47,9 @@ fn main() {
         let link = link.unwrap();
         let file_content = download_firmware(&link, &client);
 
-        let filename = get_filename(link.as_str());
-        let path = get_path(filename, &target_directory);
+        let filename = get_filename_for_firmware(link.as_str());
+        let path = get_path(&target_directory, filename);
+        let path = get_path(&target_directory, filename);
         let mut file = File::create(&path).unwrap();
 
         let start = time::now();
@@ -99,11 +100,11 @@ fn unzip<'a>(path: &Path, output_path: &'a str) -> io::Result<ExitStatus> {
         .status()
 }
 
-fn get_filename(link: &str) -> &str {
+fn get_filename_for_firmware(link: &str) -> &str {
     link.rsplit("%2F").nth(0).unwrap()
 }
 
-fn get_path<'a>(filename: &'a str, target_directory: &String) -> PathBuf {
+fn get_path<'a>(target_directory: &String, filename: &'a str) -> PathBuf {
     Path::new(&target_directory).join(filename)
 }
 
