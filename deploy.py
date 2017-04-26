@@ -1,5 +1,4 @@
 import boto3
-import botocore
 import sys
 
 try:
@@ -15,9 +14,10 @@ except IndexError:
   bucket_name = "yealink-firmware"
 
 region_name = "eu-central-1"
-config = botocore.config.Config(region_name=region_name, signature_version='v4')
+# config = botocore.config.Config(region_name=region_name, signature_version='v4')
 # see http://boto3.readthedocs.io/en/latest/guide/configuration.html for setting the credentials
-s3 = boto3.resource('s3', region_name=region_name, config=config)
+# s3 = boto3.resource('s3', region_name=region_name, config=config)
+s3 = boto3.resource('s3', region_name=region_name)
 bucket = s3.Bucket(bucket_name)
 
 try:
