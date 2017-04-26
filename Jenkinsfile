@@ -4,6 +4,13 @@ pipeline {
     agent any
 
     stages {
+        stage('Credential test') {
+            steps {
+                withCredentials([[$class: 'FileBinding', credentialsId: '{876876-9687-ABFE}', variable: 'SECRET_FILE']]) {
+                    echo "${SECRET_FILE}"
+                }
+            }
+        }
         stage('Run stable') {
             steps {
                 sh 'rustup default stable'
