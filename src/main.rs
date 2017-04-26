@@ -116,15 +116,11 @@ fn get_firmware<'a>(new_firmware_regex: &Regex, body: &'a str, url: &'a str) -> 
 }
 
 fn download_firmware<'a>(link: &'a str, client: &Client) -> Vec<u8> {
-    let response: Option<hyper::client::Response> = match client.get(link).send() {
-        Ok(val) => { Some(val) }
-        Err(e) => {
-            println!("Couldn't read data from `{:?}` due to an error: {:?}", link, e);
-            None
-        }
+    let mut response: hyper::client::Response = match get_response(link, client) {
+        Some(val) => { val }
+        None => panic!("Error while creating connection to {}", link)
     };
 
-    let mut response = response.unwrap();
     let mut file_content = Vec::new();
 
     let start = time::now();
@@ -138,6 +134,16 @@ fn download_firmware<'a>(link: &'a str, client: &Client) -> Vec<u8> {
     };
 
     file_content
+}
+
+fn get_response<'a>(link: &'a str, client: &Client) -> Option<hyper::client::Response> {
+    match client.get(link).send() {
+        Ok(val) => { Some(val) }
+        Err(e) => {
+            println!("Couldn't read data from `{:?}` due to an error: {:?}", link, e);
+            None
+        }
+    }
 }
 
 fn write_file(file: &mut File, content: Vec<u8>) -> io::Result<usize> {
