@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Credential test') {
             steps {
-                withCredentials([[$class: 'FileBinding', credentialsId: '{aws_credentials}', variable: 'credentials']]) {
+                withCredentials([[$class: 'FileBinding', credentialsId: 'aws_credentials', variable: 'credentials']]) {
                     echo "${credentials}"
                 }
             }
