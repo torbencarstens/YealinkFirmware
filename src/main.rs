@@ -27,7 +27,7 @@ fn main() {
     let matches = app.get_matches();
 
     let base_url = "http://support.yealink.com/documentFront/forwardToDocumentDetailPage?documentId=";
-    let device_id = 33;
+    let device_id = matches.value_of("Device ID").unwrap();
     let url = get_device_url(base_url, device_id);
 
     let target_directory = get_target_directory(&matches);
@@ -197,7 +197,7 @@ fn get_first_firmware<'a>(body: &'a str, url: &'a str) -> Option<regex::Match<'a
     regex.find_at(body, start_index)
 }
 
-fn get_device_url(base: &str, id: i32) -> String {
+fn get_device_url(base: &str, id: &str) -> String {
     format!("{}{}", base, id)
 }
 
@@ -212,7 +212,8 @@ fn get_target_directory<'a>(matches: &ArgMatches<'a>) -> String {
 fn get_command_line_app<'a, 'b>() -> App<'a, 'b> {
     let mut app: App = App::new("YealinkFirmware");
     app = app.arg(Arg::with_name("Target directory").long("directory").short("d").takes_value(true).default_value(".").max_values(1).help("Directory where the zip file will be written to."));
-    app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."))
+    app = app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."));
+    app.arg(Arg::with_name("Device ID").long("device-id").short("i").takes_value(true).max_values(1).default_value("33"))
 }
 
 fn get_client() -> Client {
