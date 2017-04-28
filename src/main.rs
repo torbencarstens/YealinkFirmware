@@ -48,45 +48,47 @@ fn main() {
     // let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
 
     let link = get_link(captures);
+    if link.is_none() {
+        println!("No link found ");
+        return;
+    }
 
-    if link.is_some() {
-        let link = link.unwrap();
-        let file_content = download_firmware(&link, &client);
+    let link = link.unwrap();
+    let file_content = download_firmware(&link, &client);
 
-        let filename = get_filename_for_firmware(link.as_str());
-        let path = get_path(&target_directory, filename);
-        let mut file = File::create(&path).unwrap();
+    let filename = get_filename_for_firmware(link.as_str());
+    let path = get_path(&target_directory, filename);
+    let mut file = File::create(&path).unwrap();
 
-        let start = time::now();
-        match write_file(&mut file, file_content) {
-            Ok(size) => {
-                let end = time::now().sub(start);
-                let path = path.as_path().to_str().unwrap();
-                let time = format!("{}.{}s", end.num_seconds(), end.num_milliseconds());
-                let size = convert(size as f64);
-                println!("Successfully wrote `{}` with {} from `{}` in {}.", path, size, link, time)
-            }
-            Err(e) => {
-                println!("Writing file `{}` failed due to error: {:?}", filename, e)
+    let start = time::now();
+    match write_file(&mut file, file_content) {
+        Ok(size) => {
+            let end = time::now().sub(start);
+            let path = path.as_path().to_str().unwrap();
+            let time = format!("{}.{}s", end.num_seconds(), end.num_milliseconds());
+            let size = convert(size as f64);
+            println!("Successfully wrote `{}` with {} from `{}` in {}.", path, size, link, time)
+        }
+        Err(e) => {
+            println!("Writing file `{}` failed due to error: {:?}", filename, e)
+        }
+    }
+
+    let output_path = path.parent().unwrap().to_str().unwrap();
+    println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
+    match unzip(&path, output_path) {
+        Ok(_) => {
+            let end = time::now().sub(start);
+            println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
+
+            if remove_zip {
+                delete_zip(&path)
             }
         }
-
-        let output_path = path.parent().unwrap().to_str().unwrap();
-        println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
-        match unzip(&path, output_path) {
-            Ok(_) => {
-                let end = time::now().sub(start);
-                println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
-
-                if remove_zip {
-                    delete_zip(&path)
-                }
-            }
-            Err(e) => {
-                println!("Failed unzipping file ({}) due to error: {:?}", path.to_str().unwrap(), e);
-            }
-        };
-    }
+        Err(e) => {
+            println!("Failed unzipping file ({}) due to error: {:?}", path.to_str().unwrap(), e);
+        }
+    };
 
     let end = time::now().sub(start);
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
