@@ -36,11 +36,15 @@ fn main() {
     let client = get_client();
     let body: String = get_body(url.as_str(), &client);
 
-    let new_firmware_regex = Regex::new("<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new").expect("Failed to compile new firmware regex.");
+    let new_firmware_regex = "<a href=\"(?P<link>.*\\.zip)\".*\\n\\s*<span class=\"firm-new";
+    let new_firmware_regex = Regex::new(new_firmware_regex)
+        .expect("Failed to compile new firmware regex.");
+
     let captures = match get_firmware_match(&new_firmware_regex, body.as_str(), url.as_str()) {
         (val, false) => { get_captures(&new_firmware_regex, val) }
         (val, true) => {
-            let alternate_firmware_regex = Regex::new("href=\"(?P<link>.*\\.zip)\"").expect("Failed to compile alternative firmware regex");
+            let alternate_firmware_regex = Regex::new("href=\"(?P<link>.*\\.zip)\"")
+                .expect("Failed to compile alternative firmware regex");
             get_captures(&alternate_firmware_regex, val)
         }
     };
