@@ -64,10 +64,10 @@ fn main() {
     let path = get_path(&target_directory, filename);
     let mut file = File::create(&path).unwrap();
 
-    let start = time::now();
+    let write_start = time::now();
     match write_file(&mut file, file_content) {
         Ok(size) => {
-            let end = time::now().sub(start);
+            let end = time::now().sub(write_start);
             let path = path.as_path().to_str().unwrap();
             let time = format!("{}.{}s", end.num_seconds(), end.num_milliseconds());
             let size = convert(size as f64);
@@ -80,9 +80,10 @@ fn main() {
 
     let output_path = path.parent().unwrap().to_str().unwrap();
     println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
+    let unzip_start = time::now();
     match unzip(&path, output_path) {
         Ok(_) => {
-            let end = time::now().sub(start);
+            let end = time::now().sub(unzip_start);
             println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
 
             if remove_zip {
