@@ -11,7 +11,7 @@ pub struct Zip<'a> {
 impl<'a> Zip<'a> {
     pub fn from(path: &'a Path) -> Self {
         Zip {
-            path
+            path: path
         }
     }
 
