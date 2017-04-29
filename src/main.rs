@@ -16,10 +16,8 @@ use pretty_bytes::converter::convert;
 
 use regex::Regex;
 
-use std::fs;
 use std::fs::File;
 use std::path::{Path, PathBuf};
-use std::process::{Command, ExitStatus};
 use std::io;
 use std::io::{Read, Write};
 use std::ops::Sub;
@@ -85,14 +83,10 @@ fn main() {
     let output_path = path.parent().unwrap().to_str().unwrap();
     println!("Unzipping {} to {}", path.to_str().unwrap(), output_path);
     let unzip_start = time::now();
-    match unzip(&path, output_path) {
+    match unzip(&path, output_path, Some(remove_zip)) {
         true => {
             let end = time::now().sub(unzip_start);
             println!("Finished unzipping in {}.{}s", end.num_seconds(), end.num_milliseconds());
-
-            if remove_zip {
-                delete_zip(&path)
-            }
         }
         false => {
             println!("Failed unzipping file ({}) due to error", path.to_str().unwrap());
@@ -103,15 +97,8 @@ fn main() {
     println!("Finished execution in {}.{}s", end.num_seconds(), end.num_milliseconds());
 }
 
-fn delete_zip(path: &Path) {
-    match fs::remove_file(&path) {
-        Ok(_) => { println!("Successfully deleted .zip file.") }
-        Err(e) => println!("Failed to delete .zip file: {:?}", e)
-    };
-}
-
-fn unzip<'a>(path: &Path, output_path: &'a str) -> bool {
-    Zip::from(path).unzip(Some(output_path.to_owned())).success()
+fn unzip<'a>(path: &Path, output_path: &'a str, remove: Option<bool>) -> bool {
+    Zip::from(path).unzip(Some(output_path.to_owned()), remove).success()
 }
 
 fn get_filename_for_firmware(link: &str) -> &str {
