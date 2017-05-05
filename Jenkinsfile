@@ -38,7 +38,7 @@ pipeline {
                     withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'aws-s3-credentials', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         def files = findFiles(glob: "*.rom")
                         def file = files[0]
-                        sh "python3 deploy.py ${file}"
+                        sh "python3.6 deploy.py ${file}"
                     }
                 }
             }
