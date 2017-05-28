@@ -51,11 +51,9 @@ fn main() {
         }
     };
 
-    // let captures: Option<regex::Captures> = get_captures(&new_firmware_regex, regex_match);
-
     let link = get_link(captures);
     if link.is_none() {
-        println!("No link found ");
+        println!("No link found");
         return;
     }
 
