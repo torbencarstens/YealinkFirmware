@@ -204,7 +204,7 @@ fn get_target_directory<'a>(matches: &ArgMatches<'a>) -> String {
 fn get_command_line_app<'a, 'b>() -> App<'a, 'b> {
     let mut app: App = App::new("YealinkFirmware");
     app = app.arg(Arg::with_name("Target directory").long("directory").short("d").takes_value(true).default_value(".").max_values(1).help("Directory where the zip file will be written to."));
-    app = app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(false).help("Deletes the zip file after unzipping."));
+    app = app.arg(Arg::with_name("Remove zip").long("remove").short("r").takes_value(true).help("Deletes the zip file after unzipping."));
     app.arg(Arg::with_name("Device ID").long("device-id").short("i").takes_value(true).max_values(1).default_value("33"))
 }
 
