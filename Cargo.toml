@@ -5,7 +5,7 @@ authors = ["Chabare <chabare95@gmail.com>"]
 
 [dependencies]
 clap = ""
-hyper = ""
+hyper = "0.10"
 regex = ""
 pretty-bytes = ""
 time = ""
